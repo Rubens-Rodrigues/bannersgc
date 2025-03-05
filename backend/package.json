@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/public/templates && cp -r public/templates dist/public/",
     "start": "node dist/server.js"
   },
   "keywords": [],

@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import puppeteer from "puppeteer";
 import csvParser from "csv-parser";
 import { createCanvas, loadImage } from "canvas";
 
@@ -88,9 +87,10 @@ const textPositions = {
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
-  const templateURL = `https://bannersgc.vercel.app${templatePath}`;
+  const templateURL = `https://api-bannersgc.onrender.com${templatePath}`;
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
-  const outputPath = path.join(__dirname, `../../public/${outputFileName}`);
+  const outputPath = path.join(__dirname, "../../public", outputFileName);
+
 
   try {
     const image = await loadImage(templateURL);

@@ -18,11 +18,11 @@ export const getTemplateFileName = (dia: string, format: "feed" | "story") => {
   if (!dia) return null; // Se o dia for vazio, retorna null
 
   const fileNames: { [key: string]: string } = {
-    "Segunda-feira": "templategcsegunda",
-    "Terça-feira": "templategcterca",
-    "Quinta-feira": "templategcquinta",
-    "Sexta-feira": "templategcsexta",
-    "Sábado": "templategcsabado",
+    "Segunda-feira": "template_gc_segunda",
+    "Terça-feira": "template_gc_terca",
+    "Quinta-feira": "template_gc_quinta",
+    "Sexta-feira": "template_gc_sexta",
+    "Sábado": "template_gc_sabado",
   };
 
   return fileNames[dia] ? process.env.PUBLIC_URL + `/templates/${fileNames[dia]}_${format}.jpg` : null;

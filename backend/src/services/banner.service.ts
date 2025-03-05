@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import csvParser from "csv-parser";
 import { createCanvas, loadImage } from "canvas";
-import fetch from 'node-fetch';
 
 /* Processa um arquivo CSV e gera múltiplos banners */
 export const processCSV = async (filePath: string): Promise<string[]> => {
@@ -94,26 +93,14 @@ if (!fs.existsSync(publicDir)) {
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
-  const templateURL = `https://bannersgc.vercel.app/${templatePath}`;
+  const templateURL = `https://bannersgc.vercel.app${templatePath}`;
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
-  // const outputPath = path.join(__dirname, "../../public", outputFileName);
-  const outputPath = path.resolve("./public", outputFileName);
-  const tempImagePath = path.resolve("./public", "template_temp.jpg"); // Caminho temporário para salvar o template
+  const outputPath = path.join(__dirname, "../../public", outputFileName);
+  // const outputPath = path.resolve("./public", outputFileName);
 
-
+  console.log("🔹 Tentando carregar imagem do template:", templateURL);
   try {
-     // ✅ 1. Baixa a imagem primeiro e salva localmente
-     const response = await fetch(templateURL);
-     if (!response.ok) throw new Error(`Erro ao buscar imagem: ${response.statusText}`);
-     
-    console.log("🔹 Tentando carregar imagem do template:", templateURL);
-
-    const buffer = await response.buffer();
-    fs.writeFileSync(tempImagePath, buffer); // Salva temporariamente a imagem
-
-    // const image = await loadImage(templateURL);
-    const image = await loadImage(tempImagePath);
-
+    const image = await loadImage(templateURL);
     const width = format === "feed" ? 1080 : 1080;
     const height = format === "feed" ? 1080 : 1920;
 
@@ -148,17 +135,13 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     ctx.fillStyle = positions.lideres.color;
     ctx.fillText(`${gc.lideres} - ${gc.telefone}`, positions.lideres.x, positions.lideres.y);
 
-      // Salva a imagem gerada
-      const outputBuffer = canvas.toBuffer("image/png");
-      fs.writeFileSync(outputPath, outputBuffer);
-  
-      // ✅ 3. Apaga o template temporário depois do uso
-      fs.unlinkSync(tempImagePath);
-  
-    console.log(`✅ Banner salvo com sucesso: ${outputPath}`);
-    return outputFileName;
+    //Salva a imagem gerada
+    const buffer = canvas.toBuffer("image/png");
+    fs.writeFileSync(outputPath, buffer);
+
+    return outputFileName; 
   } catch (error) {
-    console.error("❌ Erro ao gerar banner:", error);
+    console.error("Erro ao gerar banner:", error);
     throw error;
   }
 };

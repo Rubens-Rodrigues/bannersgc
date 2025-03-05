@@ -33,11 +33,11 @@ export default function BannerForm() {
 
     const getTemplateFileName = (dia: string, format: "feed" | "story") => {
       const fileNames: { [key: string]: string } = {
-        "Segunda-feira": "template_gc_segunda",
-        "Terça-feira": "template_gc_terca",
-        "Quinta-feira": "template_gc_quinta",
-        "Sexta-feira": "template_gc_sexta",
-        "Sábado": "template_gc_sabado",
+        "Segunda-feira": "templategcsegunda",
+        "Terça-feira": "templategcterca",
+        "Quinta-feira": "templategcquinta",
+        "Sexta-feira": "templategcsexta",
+        "Sábado": "templategcsabado",
       };
 
       return fileNames[dia] ? `/templates/${fileNames[dia]}_${format}.jpg` : null;

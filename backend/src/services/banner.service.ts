@@ -84,15 +84,23 @@ const textPositions = {
   },
 };
 
+//  Garante que a pasta public exista antes de salvar os banners
+const publicDir = path.join(__dirname, "../../public");
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
   const templateURL = `https://bannersgc.vercel.app${templatePath}`;
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
-  const outputPath = path.join(__dirname, "../../public", outputFileName);
-
+  // const outputPath = path.join(__dirname, "../../public", outputFileName);
+  const outputPath = path.resolve("./public", outputFileName);
 
   try {
+    console.log("🔹 Tentando carregar imagem do template:", templateURL);
+
     const image = await loadImage(templateURL);
     const width = format === "feed" ? 1080 : 1080;
     const height = format === "feed" ? 1080 : 1920;
@@ -132,9 +140,10 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     const buffer = canvas.toBuffer("image/png");
     fs.writeFileSync(outputPath, buffer);
 
-    return outputFileName; 
+    console.log(`✅ Banner salvo com sucesso: ${outputPath}`);
+    return outputFileName;
   } catch (error) {
-    console.error("Erro ao gerar banner:", error);
+    console.error("❌ Erro ao gerar banner:", error);
     throw error;
   }
 };

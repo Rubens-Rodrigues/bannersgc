@@ -88,13 +88,13 @@ const textPositions = {
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
-  const templateURL = path.join(__dirname, "../../public", templatePath);
+  const templateURL = path.join(__dirname, "../public", templatePath);
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
   const outputPath = path.join(__dirname, `../../public/${outputFileName}`);
-
+  
   try {
     // const image = await loadImage(templateURL);
-    const image = await loadImage(`file://${templateURL}`);
+    const image = await loadImage(templateURL);
     const width = format === "feed" ? 1080 : 1080;
     const height = format === "feed" ? 1080 : 1920;
 

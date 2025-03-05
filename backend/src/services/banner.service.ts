@@ -96,9 +96,8 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
   const templateURL = `https://bannersgc.vercel.app${templatePath}`;
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
   const outputPath = path.join(__dirname, "../../public", outputFileName);
-  // const outputPath = path.resolve("./public", outputFileName);
 
-  console.log("🔹 Tentando carregar imagem do template:", templateURL);
+  
   try {
     const image = await loadImage(templateURL);
     const width = format === "feed" ? 1080 : 1080;

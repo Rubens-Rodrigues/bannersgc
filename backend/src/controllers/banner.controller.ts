@@ -16,6 +16,8 @@ export const generateBannersFromCSV = async (req: Request, res: Response) => {
 
     const bannerUrls = banners.map(fileName => `${BASE_URL}${fileName}`);
 
+    console.log(`✅ Banners gerados com sucesso! Total: ${banners.length}`);
+    
     res.status(200).json({
       message: "Banners gerados!",
       banners: bannerUrls,
@@ -38,6 +40,8 @@ export const generateSingleBanner = async (req: Request, res: Response) => {
 
     const feedPath = await generateBanner({ nome, dia, horario, bairro, endereco, lideres, telefone }, "feed", feedTemplate);
     const storyPath = await generateBanner({ nome, dia, horario, bairro, endereco, lideres, telefone }, "story", storyTemplate);
+    
+    console.log("✅ Banner individual gerado com sucesso!");
 
     res.status(200).json({
       message: "Banners gerados!",

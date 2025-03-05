@@ -88,6 +88,12 @@ export default function BannerForm() {
 
   return (
     <div className="container">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-text">Carregando...</div>
+        </div>
+      )}
+
       <img src="logo.png" alt="Logo" className="logo" />
 
       <div className="form-container">

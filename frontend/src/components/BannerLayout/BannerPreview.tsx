@@ -15,7 +15,7 @@ interface BannerPreviewProps {
 
 // Função para obter o caminho correto da imagem
 export const getTemplateFileName = (dia: string, format: "feed" | "story") => {
-  if (!dia) return null; // Se o dia for vazio, retorna null
+  if (!dia) return null; 
 
   const fileNames: { [key: string]: string } = {
     "Segunda-feira": "template_gc_segunda",

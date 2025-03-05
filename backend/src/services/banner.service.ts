@@ -92,8 +92,8 @@ if (!fs.existsSync(publicDir)) {
 
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
-  // const templateURL = `http://localhost:3000${templatePath}`;
-  const templateURL = `https://bannersgc.vercel.app${templatePath}`;
+  const templateURL = `http://localhost:3000${templatePath}`;
+  // const templateURL = `https://bannersgc.vercel.app${templatePath}`;
   const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
   const outputPath = path.join(__dirname, "../../public", outputFileName);
 

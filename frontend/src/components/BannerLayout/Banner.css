@@ -3,6 +3,10 @@
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
 }
 
 .banner-preview {
@@ -42,14 +46,17 @@
   font-weight: bold;
   text-transform: uppercase;
   color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .hora {
-  margin-bottom: -2px;
-  margin-left: 73px;
+  margin-bottom: -6px;
+  margin-left: 60px;
   font-weight: bold;
   font-size: 15px;
+  @media (max-width: 600px) {
+    margin-bottom: 21px;
+  }
 }
 
 .bairro {
@@ -76,14 +83,17 @@
   }
 
   .gc-title {
-    margin-bottom: 120px;
+    margin-bottom: 110px;
   }
 
   .hora {
-    margin-bottom: 24px;
-    margin-left: 85px;
+    margin-bottom: 15px;
+    margin-left: 65px;
     font-weight: bold;
     font-size: 17px;
+    @media (max-width: 600px) {
+      margin-bottom: 48px;
+    }
   }
 
 

@@ -92,6 +92,12 @@ export default function UploadCSV() {
 
   return (
     <div className="container">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-text">Carregando...</div>
+        </div>
+      )}
+
       <img src="logo.png" alt="Logo" className="logo" />
       <br /><br /><br /><br /><br />
       <h1>Upload de CSV</h1>
@@ -109,7 +115,7 @@ export default function UploadCSV() {
       {previewData.length > 0 && (
         <div>
           <h2>Pré-visualização</h2>
-          <div style={{flexDirection: 'column'}} className="preview-container">
+          <div style={{ flexDirection: 'column' }} className="preview-container">
             {previewData.map((gc, index) => (
               <div key={index} className="preview-item">
                 <BannerPreview formData={gc} />

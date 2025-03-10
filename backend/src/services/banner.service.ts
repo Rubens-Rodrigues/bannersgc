@@ -93,28 +93,28 @@ if (!fs.existsSync(publicDir)) {
 }
 
 // Função para quebrar o texto do endereço em várias linhas
-const breakTextIntoLines = (text: string, ctx: CanvasRenderingContext2D, maxWidth: number, fontSize: number): string[] => {
+const wrapText = (ctx: any, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
   const words = text.split(" ");
-  let lines: string[] = [];
-  let currentLine = "";
+  let line = "";
+  const lines: string[] = [];
 
-  words.forEach(word => {
-    let testLine = currentLine ? `${currentLine} ${word}` : word;
-    let testWidth = ctx.measureText(testLine).width;
-
-    if (testWidth > maxWidth) {
-      lines.push(currentLine);
-      currentLine = word;
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && i > 0) {
+      lines.push(line);
+      line = words[i] + " ";
     } else {
-      currentLine = testLine;
+      line = testLine;
     }
+  }
+  lines.push(line);
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line.trim(), x, y + index * lineHeight);
   });
 
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
-  return lines;
+  return lines.length * lineHeight; // Retorna a altura ocupada pelo texto
 };
 
 // Gera um banner com base nos dados enviados
@@ -167,19 +167,14 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
 
     ctx.font = `${positions.endereco.size}px Arial`;
     ctx.fillStyle = positions.endereco.color;
-
-    const maxWidth = 500; // Define a largura máxima antes de quebrar linha
     const textoLocal = "Local: " + gc.endereco;
-    const wrappedText = breakTextIntoLines(textoLocal, ctx, maxWidth, positions.endereco.size);
+    const enderecoHeight = wrapText(ctx, textoLocal, positions.endereco.x, positions.endereco.y, 550, 30); // Ajuste o maxWidth conforme necessário
 
-    wrappedText.forEach((line, index) => {
-      ctx.fillText(line, positions.endereco.x, positions.endereco.y + (index * positions.endereco.size * 1.2));
-    });
 
 
     ctx.font = `${positions.lideres.size}px Arial`;
     ctx.fillStyle = positions.lideres.color;
-    ctx.fillText(`${gc.lideres} - ${gc.telefone}`, positions.lideres.x, positions.lideres.y);
+    ctx.fillText(`${gc.lideres} - ${gc.telefone}`, positions.lideres.x, positions.endereco.y + enderecoHeight + 10);
 
     //Salva a imagem gerada
     const buffer = canvas.toBuffer("image/png");

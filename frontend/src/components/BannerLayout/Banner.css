@@ -51,7 +51,7 @@
 
 .hora {
   margin-bottom: -6px;
-  margin-left: 60px;
+  /* margin-left: 0; */
   font-weight: bold;
   font-size: 15px;
   @media (max-width: 600px) {
@@ -88,7 +88,7 @@
 
   .hora {
     margin-bottom: 15px;
-    margin-left: 65px;
+    /* margin-left: 65px; */
     font-weight: bold;
     font-size: 17px;
     @media (max-width: 600px) {

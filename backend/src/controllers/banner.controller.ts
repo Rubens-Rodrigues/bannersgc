@@ -1,4 +1,7 @@
 import { Request, Response } from 'express';
+import archiver from "archiver";
+import fs from "fs";
+import path from "path";
 import { processCSV, generateBanner } from '../services/banner.service';
 
 // const BASE_URL = "http://localhost:4000/public/";
@@ -14,16 +17,35 @@ export const generateBannersFromCSV = async (req: Request, res: Response) => {
 
     const banners = await processCSV(req.file.path);
 
-    const bannerUrls = banners.map(fileName => `${BASE_URL}${fileName}`);
+    const feedBanners = banners.filter(fileName => fileName.includes("-feed"));
+    const storyBanners = banners.filter(fileName => fileName.includes("-story"));
 
     console.log(`✅ Banners gerados com sucesso! Total: ${banners.length}`);
-    
-    res.status(200).json({
-      message: "Banners gerados!",
-      banners: bannerUrls,
+
+    // Criar um arquivo ZIP para download
+    const zipPath = path.join(__dirname, "../../public/banners.zip");
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver("zip", { zlib: { level: 9 } });
+
+    output.on("close", () => {
+      console.log(`📦 ZIP criado: ${archive.pointer()} bytes`);
+      res.status(200).json({ message: "Banners gerados!", zipUrl: `${BASE_URL}banners.zip` });
     });
 
+    archive.on("error", (err) => {
+      console.error("❌ Erro ao criar ZIP:", err);
+      res.status(500).json({ error: "Erro ao criar o ZIP dos banners" });
+    });
+
+    archive.pipe(output);
+
+    // Adicionar arquivos ao ZIP
+    feedBanners.forEach(fileName => archive.file(`./public/BannersFeed/${fileName}`, { name: `BannersFeed/${fileName}` }));
+    storyBanners.forEach(fileName => archive.file(`./public/BannersStory/${fileName}`, { name: `BannersStory/${fileName}` }));
+
+    archive.finalize();
   } catch (error) {
+    console.error("❌ Erro ao gerar os banners:", error);
     res.status(500).json({ error: "Erro ao gerar os banners" });
   }
 };
@@ -45,7 +67,10 @@ export const generateSingleBanner = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Banners gerados!",
-      banners: [`${BASE_URL}${feedPath}`, `${BASE_URL}${storyPath}`],
+      banners: [
+        `${BASE_URL}BannersFeed/${feedPath}`,
+        `${BASE_URL}BannersStory/${storyPath}`
+      ],
     });
 
   } catch (error) {

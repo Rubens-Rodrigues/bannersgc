@@ -15,17 +15,17 @@ interface BannerPreviewProps {
 
 // Função para obter o caminho correto da imagem
 export const getTemplateFileName = (dia: string, format: "feed" | "story") => {
-  if (!dia) return null; 
+  if (!dia) return null;
 
   const fileNames: { [key: string]: string } = {
-    "Segunda-feira": "template_gc_segunda",
-    "Terça-feira": "template_gc_terca",
-    "Quinta-feira": "template_gc_quinta",
-    "Sexta-feira": "template_gc_sexta",
-    "Sábado": "template_gc_sabado",
+    "Segunda-feira": "gcsegunda",
+    "Terça-feira": "gcterca",
+    "Quinta-feira": "gcquinta",
+    "Sexta-feira": "gcsexta",
+    "Sábado": "gcsabado",
   };
 
-  return fileNames[dia] ? process.env.PUBLIC_URL + `/templates/${fileNames[dia]}_${format}.jpg` : null;
+  return fileNames[dia] ? process.env.PUBLIC_URL + `/templates/${fileNames[dia]}${format === "story" ? "story" : "feed"}.png` : null;
 };
 
 export default function BannerPreview({ formData }: BannerPreviewProps) {
@@ -42,6 +42,11 @@ export default function BannerPreview({ formData }: BannerPreviewProps) {
     }
   }, [formData.dia]);
 
+  // Obtém o primeiro nome do dia e converte para caixa alta
+  const formatarDia = (dia: string) => {
+    return dia ? dia.split("-")[0].split(" ")[0].toUpperCase() : "";
+  };
+
   return (
     <div className="preview-container">
 
@@ -52,7 +57,7 @@ export default function BannerPreview({ formData }: BannerPreviewProps) {
             <img src={feedBanner} alt={`Feed ${formData.dia}`} className="banner-image" />
             <div className="overlay-text">
               <h2 className="gc-title">{formData.nome}</h2>
-              <p className="gc-info hora">{formData.horario}</p>
+              <p className="gc-info hora">{formatarDia(formData.dia)} {formData.horario}</p>
               <p className="gc-info bairro">{formData.bairro}</p>
               <p className="gc-info endereco"><strong>Local: </strong>{formData.endereco}</p>
               <p className="gc-info lideres">{formData.lideres} - <strong>{formData.telefone}</strong></p>
@@ -68,7 +73,7 @@ export default function BannerPreview({ formData }: BannerPreviewProps) {
             <img src={storyBanner} alt={`Story ${formData.dia}`} className="banner-image" />
             <div className="overlay-text">
               <h2 className="gc-title">{formData.nome}</h2>
-              <p className="gc-info hora">{formData.horario}</p>
+              <p className="gc-info hora">{formatarDia(formData.dia)} {formData.horario}</p>
               <p className="gc-info bairro">{formData.bairro}</p>
               <p className="gc-info endereco"><strong>Local: </strong>{formData.endereco}</p>
               <p className="gc-info lideres">{formData.lideres} - <strong>{formData.telefone}</strong></p>

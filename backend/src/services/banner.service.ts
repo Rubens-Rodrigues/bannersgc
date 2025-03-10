@@ -57,27 +57,29 @@ export const processCSV = async (filePath: string): Promise<string[]> => {
 /* Função que retorna o caminho do template baseado no dia */
 const getTemplateFileName = (dia: string, format: "feed" | "story"): string | null => {
   const fileNames: { [key: string]: string } = {
-    "Segunda-feira": "template_gc_segunda",
-    "Terça-feira": "template_gc_terca",
-    "Quinta-feira": "template_gc_quinta",
-    "Sexta-feira": "template_gc_sexta",
-    "Sábado": "template_gc_sabado",
+    "Segunda-feira": "gcsegunda",
+    "Terça-feira": "gcterca",
+    "Quinta-feira": "gcquinta",
+    "Sexta-feira": "gcsexta",
+    "Sábado": "gcsabado",
   };
 
-  return fileNames[dia] ? `/templates/${fileNames[dia]}_${format}.jpg` : null;
+  return fileNames[dia] ? `/templates/${fileNames[dia]}${format === "story" ? "story" : "feed"}.png` : null;
 };
 
 const textPositions = {
   feed: {
-    title: { x: 540, y: 720, size: 60, color: "#fff", align: "center" }, 
-    hora: { x: 625, y: 856, size: 40, color: "#000", align: "left" }, 
+    title: { x: 540, y: 720, size: 60, color: "#fff", align: "center" },
+    dia: { x: 480, y: 856, size: 40, color: "#000", align: "left" },
+    hora: { x: 655, y: 856, size: 40, color: "#000", align: "left" },
     bairro: { x: 540, y: 940, size: 25, color: "#000", align: "center" },
     endereco: { x: 540, y: 980, size: 25, color: "#000", align: "center" },
     lideres: { x: 540, y: 1010, size: 25, color: "#000", align: "center" },
   },
   story: {
-    title: { x: 540, y: 1095, size: 60, color: "#fff", align: "center" }, 
-    hora: { x: 627, y: 1460, size: 48, color: "#000", align: "left" }, 
+    title: { x: 540, y: 1095, size: 60, color: "#fff", align: "center" },
+    dia: { x: 465, y: 1460, size: 48, color: "#000", align: "left" },
+    hora: { x: 655, y: 1460, size: 48, color: "#000", align: "left" },
     bairro: { x: 540, y: 1540, size: 35, color: "#000", align: "center" },
     endereco: { x: 540, y: 1590, size: 35, color: "#000", align: "center" },
     lideres: { x: 540, y: 1635, size: 35, color: "#000", align: "center" },
@@ -94,10 +96,17 @@ if (!fs.existsSync(publicDir)) {
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
   const templateURL = `https://bannersgc.vercel.app${templatePath}`;
-  const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
-  const outputPath = path.join(__dirname, "../../public", outputFileName);
+  // Definir a pasta de saída com base no tipo de banner
+  const outputDir = path.join(__dirname, `../../public/Banners${format === "feed" ? "Feed" : "Story"}`);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true }); // Criar a pasta se não existir
+  }
 
-  
+  // Caminho final do arquivo dentro da pasta correspondente
+  const outputFileName = `${gc.nome.replace(/\s+/g, "_")}-${format}.png`;
+  const outputPath = path.join(outputDir, outputFileName);
+
+
   try {
     const image = await loadImage(templateURL);
     const width = format === "feed" ? 1080 : 1080;
@@ -116,6 +125,12 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     ctx.font = `bold ${positions.title.size}px Arial`;
     ctx.fillStyle = positions.title.color;
     ctx.fillText(gc.nome, positions.title.x, positions.title.y);
+
+    // Converte o nome do dia para caixa alta e extrai a primeira palavra
+    const diaFormatado = gc.dia.split("-")[0].split(" ")[0].toUpperCase();
+    ctx.font = `bold ${positions.dia.size}px Arial`;
+    ctx.fillStyle = positions.dia.color;
+    ctx.fillText(diaFormatado, positions.dia.x, positions.dia.y);
 
     ctx.font = `bold ${positions.hora.size}px Arial`;
     ctx.fillStyle = positions.hora.color;
@@ -138,7 +153,7 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     const buffer = canvas.toBuffer("image/png");
     fs.writeFileSync(outputPath, buffer);
 
-    return outputFileName; 
+    return outputFileName;
   } catch (error) {
     console.error("Erro ao gerar banner:", error);
     throw error;

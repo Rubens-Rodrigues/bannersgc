@@ -49,37 +49,37 @@ export default function UploadCSV() {
       toast.error("Selecione um arquivo CSV.");
       return;
     }
-
+  
     setLoading(true);
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     try {
       const response = await api.post("/generate", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+  
       if (response.status === 200) {
         toast.success("Banners gerados e baixados com sucesso!");
-
+  
         // Obtém a URL do arquivo ZIP
         const zipUrl = response.data.zipUrl;
-
+  
         // Faz o download automático do arquivo ZIP
         const responseZip = await fetch(zipUrl);
         const blob = await responseZip.blob();
         const blobUrl = window.URL.createObjectURL(blob);
-
+  
         const link = document.createElement("a");
         link.href = blobUrl;
         link.setAttribute("download", "banners.zip"); // Nome do arquivo ZIP
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
+  
         window.URL.revokeObjectURL(blobUrl);
-
+  
         setTimeout(() => navigate("/"), 1000);
       } else {
         toast.error("Erro ao gerar banners.");
@@ -116,11 +116,9 @@ export default function UploadCSV() {
         <div>
           <h2>Pré-visualização</h2>
           <div style={{ flexDirection: 'column' }} className="preview-container">
-            {previewData.slice(0, 3).map((gc, index) => (
+            {previewData.map((gc, index) => (
               <div key={index} className="preview-item">
                 <BannerPreview formData={gc} />
-
-                ...Visualização limitada á 3.
               </div>
             ))}
           </div>

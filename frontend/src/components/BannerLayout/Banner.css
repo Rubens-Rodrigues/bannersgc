@@ -33,7 +33,10 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  width: 60%;
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .gc-info {
@@ -54,6 +57,7 @@
   /* margin-left: 0; */
   font-weight: bold;
   font-size: 15px;
+
   @media (max-width: 600px) {
     margin-bottom: 21px;
   }
@@ -79,7 +83,10 @@
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    width: 60%;
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .gc-title {
@@ -91,6 +98,7 @@
     /* margin-left: 65px; */
     font-weight: bold;
     font-size: 17px;
+
     @media (max-width: 600px) {
       margin-bottom: 48px;
     }

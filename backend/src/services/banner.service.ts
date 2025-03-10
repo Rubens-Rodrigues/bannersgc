@@ -92,6 +92,31 @@ if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
 
+// Função para quebrar o texto do endereço em várias linhas
+const breakTextIntoLines = (text: string, ctx: CanvasRenderingContext2D, maxWidth: number, fontSize: number): string[] => {
+  const words = text.split(" ");
+  let lines: string[] = [];
+  let currentLine = "";
+
+  words.forEach(word => {
+    let testLine = currentLine ? `${currentLine} ${word}` : word;
+    let testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+};
+
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
   // const templateURL = `http://localhost:3000${templatePath}`;
@@ -113,7 +138,7 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     const height = format === "feed" ? 1080 : 1920;
 
     const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d") as any;
 
     // Renderiza o template como fundo
     ctx.drawImage(image, 0, 0, width, height);
@@ -142,8 +167,15 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
 
     ctx.font = `${positions.endereco.size}px Arial`;
     ctx.fillStyle = positions.endereco.color;
+
+    const maxWidth = 500; // Define a largura máxima antes de quebrar linha
     const textoLocal = "Local: " + gc.endereco;
-    ctx.fillText(textoLocal, positions.endereco.x, positions.endereco.y);
+    const wrappedText = breakTextIntoLines(textoLocal, ctx, maxWidth, positions.endereco.size);
+
+    wrappedText.forEach((line, index) => {
+      ctx.fillText(line, positions.endereco.x, positions.endereco.y + (index * positions.endereco.size * 1.2));
+    });
+
 
     ctx.font = `${positions.lideres.size}px Arial`;
     ctx.fillStyle = positions.lideres.color;

@@ -10,7 +10,7 @@ export const processCSV = async (filePath: string): Promise<string[]> => {
   return new Promise<string[]>((resolve, reject) => {
     const results: any[] = [];
 
-    fs.createReadStream(filePath)
+    fs.createReadStream(filePath, { highWaterMark: 1024 * 64 }) // Melhora a performance da leitura
       .pipe(csvParser())
       .on("data", (data) => {
         const gc = {
@@ -26,34 +26,35 @@ export const processCSV = async (filePath: string): Promise<string[]> => {
       })
       .on("end", async () => {
         try {
-          for (const gc of results) {
-            // Gerar os caminhos dos templates a partir do dia
+          const bannerPromises = results.map(async (gc) => {
             const feedTemplate = getTemplateFileName(gc.dia, "feed");
             const storyTemplate = getTemplateFileName(gc.dia, "story");
 
             if (!feedTemplate || !storyTemplate) {
-              throw new Error(`Template não encontrado para ${gc.dia}`);
+              console.warn(`⚠️ Template não encontrado para ${gc.dia}, pulando...`);
+              return [];
             }
 
-            const feedPath = await generateBanner(gc, "feed", feedTemplate);
-            const storyPath = await generateBanner(gc, "story", storyTemplate);
-            banners.push(feedPath, storyPath);
-          }
-          // Excluir o arquivo CSV após processá-lo
-          fs.unlinkSync(filePath);
-          resolve(banners);
+            const feedPath = generateBanner(gc, "feed", feedTemplate);
+            const storyPath = generateBanner(gc, "story", storyTemplate);
+
+            return Promise.all([feedPath, storyPath]); // Gera os banners em paralelo
+          });
+
+          const generatedBanners = await Promise.all(bannerPromises);
+          fs.unlinkSync(filePath); // Remove o CSV após processar
+          resolve(generatedBanners.flat()); // Retorna um array plano de banners gerados
         } catch (error) {
-          console.error("Erro ao gerar banners:", error);
+          console.error("❌ Erro ao gerar banners:", error);
           reject(error);
         }
       })
       .on("error", (error) => {
-        console.error("Erro ao ler o CSV:", error);
+        console.error("❌ Erro ao ler o CSV:", error);
         reject(error);
       });
   });
 };
-
 /* Função que retorna o caminho do template baseado no dia */
 const getTemplateFileName = (dia: string, format: "feed" | "story"): string | null => {
   const fileNames: { [key: string]: string } = {

@@ -1,15 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Papa from "papaparse";
 import api from "../service/api";
 import { toast } from "react-toastify";
+import { io } from "socket.io-client";
 import BannerPreview from "../components/BannerLayout/BannerPreview";
 
 export default function UploadCSV() {
   const [file, setFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [statusQueue, setStatusQueue] = useState<string[]>([]); // Fila de mensagens pendentes
+  const [currentMessage, setCurrentMessage] = useState<string | null>(null); // Exibir uma mensagem por vez
+  const [processFinished, setProcessFinished] = useState(false); // Indica se o processo foi concluído
+  const [messageLog, setMessageLog] = useState<string[]>([]); const navigate = useNavigate();
+
+  // Conecta ao WebSocket ao montar o componente
+  useEffect(() => {
+    const socket = io("http://localhost:4000");
+    // const socket = io("https://api-bannersgc.onrender.com/api/banners");
+
+    socket.on("banner_status", (data) => {
+      const message = `${data.status === "IGNORADO" ? "⚠️" : "✅"} ${data.nome} - ${data.status} ${data.motivo ? `(${data.motivo})` : ""}`;
+      setStatusQueue((prevQueue) => [...prevQueue, message]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  // Controla a exibição das mensagens uma por uma
+  useEffect(() => {
+    if (!currentMessage && statusQueue.length > 0) {
+      const nextMessage = statusQueue[0];
+      setCurrentMessage(nextMessage);
+      setMessageLog((prev) => [...prev, nextMessage]);
+      setStatusQueue((prevQueue) => prevQueue.slice(1));
+
+      setTimeout(() => {
+        setCurrentMessage(null);
+      }, 700); 
+    }
+
+    // Se não houver mais mensagens na fila e já processamos todas, mostramos o botão "OK"
+    if (statusQueue.length === 0 && processFinished) {
+      setTimeout(() => {
+        setCurrentMessage("✅ Processamento concluído!");
+      }, 2000);
+    }
+  }, [currentMessage, statusQueue, processFinished]);
 
   // Manipula a seleção do arquivo e gera a pré-visualização
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +63,6 @@ export default function UploadCSV() {
         skipEmptyLines: true,
         complete: (result) => {
           if (result.data.length > 0) {
-            // Formata os dados corretamente
             const formattedData = result.data.map((row: any) => ({
               nome: row["Nome"] || row["nome"] || "Sem Nome",
               dia: row["Dia"] || row["dia"] || "",
@@ -49,59 +88,84 @@ export default function UploadCSV() {
       toast.error("Selecione um arquivo CSV.");
       return;
     }
-  
+
     setLoading(true);
-  
+    setProcessFinished(false);
+
     const formData = new FormData();
     formData.append("file", file);
-  
+
     try {
       const response = await api.post("/generate", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
       if (response.status === 200) {
-        toast.success("Banners gerados e baixados com sucesso!");
-  
-        // Obtém a URL do arquivo ZIP
+        toast.success("Banners gerados!");
+
         const zipUrl = response.data.zipUrl;
-  
-        // Faz o download automático do arquivo ZIP
+
         const responseZip = await fetch(zipUrl);
         const blob = await responseZip.blob();
         const blobUrl = window.URL.createObjectURL(blob);
-  
+
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.setAttribute("download", "banners.zip"); // Nome do arquivo ZIP
+        link.setAttribute("download", "banners.zip");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-  
+
         window.URL.revokeObjectURL(blobUrl);
-  
-        setTimeout(() => navigate("/"), 1000);
+
+        setTimeout(() => setProcessFinished(true), 1000); // depois de 1s, exibe o botão OK
       } else {
         toast.error("Erro ao gerar banners.");
       }
     } catch (error) {
       toast.error("Erro ao enviar o arquivo.");
-    } finally {
-      setLoading(false);
+      setProcessFinished(true);
     }
   };
+
   return (
     <div className="container">
       {loading && (
         <div className="loading-overlay">
-          <div className="loading-text">Carregando...</div>
+          <div className="loading-text">
+            <h3>Gerando banners...</h3>
+            <div className="status-log">
+              {messageLog.map((msg, index) => (
+                <div key={index}>{msg}</div>
+              ))}
+            </div>
+
+            {processFinished && (
+              <button
+                onClick={() => {
+                  setLoading(false);
+                  navigate("/");
+                }}
+                className="ok-button"
+              >
+                FINALIZAR
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {processFinished && (
+        <div className="overlay">
+          <p>✅ Todos os banners foram processados!</p>
+          <button onClick={() => navigate("/")}>OK</button>
         </div>
       )}
 
       <img src="logo.png" alt="Logo" className="logo" />
       <br /><br /><br /><br /><br />
-      <h1>Upload de CSV</h1>
-      <input type="file" accept=".csv" onChange={handleFileChange} />
+      <h1>Upload de TSV</h1>
+      <input type="file" accept=".tsv" onChange={handleFileChange} />
 
       <div className="buttons">
         <button type="button" className="back-button" onClick={() => navigate("/")}>

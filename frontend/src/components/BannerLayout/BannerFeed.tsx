@@ -13,7 +13,7 @@ interface BannerProps {
 }
 
 const BannerFeed: React.FC<{ data: BannerProps }> = ({ data }) => {
-  const bannerImage = getTemplateFileName(data.dia, "feed") || "/templates/placeholder.jpg"; // Usa placeholder se for null
+  const bannerImage = getTemplateFileName(data.dia, "feed") || "/templates/placeholder.jpg";
 
   return (
     <div className="banner-wrapper">

@@ -19,7 +19,7 @@ export default function Home() {
         </div>
         <div className="card" onClick={() => navigate("/upload-csv")}>
           <h2>📁 Criar Vários Banners</h2>
-          <p>Envie um arquivo CSV e gere múltiplos banners.</p>
+          <p>Envie um arquivo TSV e gere múltiplos banners.</p>
         </div>
       </div>
     </div>

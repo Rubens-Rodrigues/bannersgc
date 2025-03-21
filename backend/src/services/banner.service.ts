@@ -155,8 +155,8 @@ const loadImageWithRetry = async (url: string, retries = 5, delay = 1000): Promi
 
 // Gera um banner com base nos dados enviados
 export const generateBanner = async (gc: any, format: "feed" | "story", templatePath: string): Promise<string> => {
-  const templateURL = `http://localhost:3000${templatePath}`;
-  // const templateURL = `https://bannersgc.vercel.app${templatePath}`;
+  // const templateURL = `http://localhost:3000${templatePath}`;
+  const templateURL = `https://bannersgc.vercel.app${templatePath}`;
 
   //Verifica se é um banner individual (não tem supervisor)
   const isIndividual = !gc.supervisor;

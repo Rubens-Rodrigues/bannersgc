@@ -4,8 +4,8 @@ import fs from "fs";
 import path from "path";
 import { processCSV, generateBanner } from '../services/banner.service';
 
-const BASE_URL = "http://localhost:4000/public/";
-// const BASE_URL = "https://api-bannersgc.onrender.com/public/";
+// const BASE_URL = "http://localhost:4000/public/";
+const BASE_URL = "https://api-bannersgc.onrender.com/public/";
 
 // Gera múltiplos banners a partir de um arquivo TSV
 export const generateBannersFromCSV = async (req: Request, res: Response) => {

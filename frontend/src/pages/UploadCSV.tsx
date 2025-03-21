@@ -40,7 +40,7 @@ export default function UploadCSV() {
 
       setTimeout(() => {
         setCurrentMessage(null);
-      }, 1500); 
+      }, 1500);
     }
 
     // Se não houver mais mensagens na fila e já processamos todas, mostramos o botão "OK"
@@ -133,7 +133,8 @@ export default function UploadCSV() {
       {loading && (
         <div className="loading-overlay">
           <div className="loading-text">
-            <h3>Gerando banners...</h3>
+            <h3>{processFinished ? "✅ Finalizada a geração de banners!" : "Gerando banners... aguarde"}</h3>
+
             <div className="status-log">
               {messageLog.map((msg, index) => (
                 <div key={index}>{msg}</div>

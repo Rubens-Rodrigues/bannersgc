@@ -40,7 +40,7 @@ export default function UploadCSV() {
 
       setTimeout(() => {
         setCurrentMessage(null);
-      }, 700); 
+      }, 1500); 
     }
 
     // Se não houver mais mensagens na fila e já processamos todas, mostramos o botão "OK"

@@ -18,7 +18,7 @@ export default function UploadCSV() {
   // Conecta ao WebSocket ao montar o componente
   useEffect(() => {
     // const socket = io("http://localhost:4000");
-    const socket = io("https://api-bannersgc.onrender.com/api/banners");
+    const socket = io("https://api-bannersgc.onrender.com");
 
     socket.on("banner_status", (data) => {
       const message = `${data.status === "IGNORADO" ? "⚠️" : "✅"} ${data.nome} - ${data.status} ${data.motivo ? `(${data.motivo})` : ""}`;

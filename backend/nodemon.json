@@ -1,0 +1,7 @@
+{
+  "ignore": [
+    "public/BannersFeed/*",
+    "public/BannersStory/*",
+    "public/banners.zip"
+  ]
+}

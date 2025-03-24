@@ -141,7 +141,7 @@ select {
 }
 
 .status-log {
-  max-height: 300px;
+  max-height: 80vh;
   overflow-y: auto;
   margin-top: 20px;
   text-align: left;

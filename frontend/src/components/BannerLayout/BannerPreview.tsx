@@ -20,6 +20,7 @@ export const getTemplateFileName = (dia: string, format: "feed" | "story") => {
   const fileNames: { [key: string]: string } = {
     "Segunda-feira": "gcsegunda",
     "Terça-feira": "gcterca",
+    "Quarta-feira": "gcquarta",
     "Quinta-feira": "gcquinta",
     "Sexta-feira": "gcsexta",
     "Sábado": "gcsabado",

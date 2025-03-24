@@ -10,69 +10,71 @@ export const processCSV = async (filePath: string, io: Server): Promise<string[]
   const batchSize = 20;
 
   return new Promise<string[]>((resolve, reject) => {
-      const results: any[] = [];
+    const results: any[] = [];
 
-      fs.createReadStream(filePath, { highWaterMark: 1024 * 64 })
-          .pipe(csvParser({ separator: "\t" }))
-          .on("data", (data) => {
-              const gc = {
-                  nome: (data["Nome"] || "").trim(),
-                  dia: (data["Dia"] || "").trim(),
-                  horario: (data["Horário"] || "").trim(),
-                  bairro: (data["Bairro"] || "").trim(),
-                  endereco: (data["Endereço"] || "").trim().replace(/,/g, ""),
-                  lideres: (data["Líderes"] || "").trim(),
-                  telefone: (data["Telefone"] || "").trim(),
-                  supervisor: (data["Supervisor"] || "Sem Supervisor").trim(),
-              };
+    fs.createReadStream(filePath, { highWaterMark: 1024 * 64 })
+      .pipe(csvParser({ separator: "\t" }))
+      .on("data", (data) => {
+        const gc = {
+          nome: (data["Nome"] || "").trim(),
+          dia: (data["Dia"] || "").trim(),
+          horario: (data["Horário"] || "").trim(),
+          bairro: (data["Bairro"] || "").trim(),
+          endereco: (data["Endereço"] || "").trim().replace(/,/g, ""),
+          lideres: (data["Líderes"] || "").trim(),
+          telefone: (data["Telefone"] || "").trim(),
+          supervisor: (data["Supervisor"] || "Sem Supervisor").trim(),
+        };
 
-              // Verifica se algum campo obrigatório está vazio
-              if (!gc.nome || !gc.dia || !gc.horario || !gc.bairro || !gc.endereco || !gc.lideres || !gc.telefone) {
-                  console.warn(`⚠️ Banner ignorado: ${gc.nome} - Dados incompletos`);
-                  io.emit("banner_status", { nome: gc.nome, status: "IGNORADO", motivo: "Dados incompletos" });
-                  return;
+        if (!gc.nome || !gc.dia || !gc.horario || !gc.bairro || !gc.endereco || !gc.lideres || !gc.telefone) {
+          const msg = `⚠️ Banner ignorado: ${gc.nome} - Dados incompletos`;
+          console.warn(msg);
+          io.emit("banner_status", { nome: gc.nome, status: "IGNORADO", motivo: "Dados incompletos", log: msg });
+          return;
+        }
+
+        results.push(gc);
+      })
+      .on("end", async () => {
+        try {
+          for (let i = 0; i < results.length; i += batchSize) {
+            const batch = results.slice(i, i + batchSize);
+            const bannerPromises = batch.map(async (gc) => {
+              const feedTemplate = getTemplateFileName(gc.dia, "feed");
+              const storyTemplate = getTemplateFileName(gc.dia, "story");
+
+              if (!feedTemplate || !storyTemplate) {
+                const msg = `⚠️ Template não encontrado para ${gc.dia}, pulando...`;
+                console.warn(msg);
+                io.emit("banner_status", { nome: gc.nome, status: "IGNORADO", motivo: "Template não encontrado", log: msg });
+                return [];
               }
 
-              results.push(gc);
-          })
-          .on("end", async () => {
-              try {
-                  for (let i = 0; i < results.length; i += batchSize) {
-                      const batch = results.slice(i, i + batchSize);
-                      const bannerPromises = batch.map(async (gc) => {
-                          const feedTemplate = getTemplateFileName(gc.dia, "feed");
-                          const storyTemplate = getTemplateFileName(gc.dia, "story");
+              const feedPath = await generateBanner(gc, "feed", feedTemplate);
+              const storyPath = await generateBanner(gc, "story", storyTemplate);
 
-                          if (!feedTemplate || !storyTemplate) {
-                              console.warn(`⚠️ Template não encontrado para ${gc.dia}, pulando...`);
-                              io.emit("banner_status", { nome: gc.nome, status: "IGNORADO", motivo: "Template não encontrado" });
-                              return [];
-                          }
+              const msg = `✅ Banner gerado: ${gc.nome}`;
+              console.log(msg);
+              io.emit("banner_status", { nome: gc.nome, status: "GERADO", log: msg });
 
-                          const feedPath = generateBanner(gc, "feed", feedTemplate);
-                          const storyPath = generateBanner(gc, "story", storyTemplate);
+              return [feedPath, storyPath];
+            });
 
-                          // Envia evento WebSocket informando o progresso
-                          io.emit("banner_status", { nome: gc.nome, status: "GERADO" });
+            const batchResults = await Promise.all(bannerPromises);
+            banners.push(...batchResults.flat());
+          }
 
-                          return Promise.all([feedPath, storyPath]);
-                      });
-
-                      const batchResults = await Promise.all(bannerPromises);
-                      banners.push(...batchResults.flat());
-                  }
-
-                  fs.unlinkSync(filePath); // Remove o TSV após processar
-                  resolve(banners);
-              } catch (error) {
-                  console.error("Erro ao gerar banners:", error);
-                  reject(error);
-              }
-          })
-          .on("error", (error) => {
-              console.error("❌ Erro ao ler o TSV:", error);
-              reject(error);
-          });
+          fs.unlinkSync(filePath); 
+          resolve(banners);
+        } catch (error) {
+          console.error("Erro ao gerar banners:", error);
+          reject(error);
+        }
+      })
+      .on("error", (error) => {
+        console.error("❌ Erro ao ler o TSV:", error);
+        reject(error);
+      });
   });
 };
 
@@ -81,6 +83,7 @@ const getTemplateFileName = (dia: string, format: "feed" | "story"): string | nu
   const fileNames: { [key: string]: string } = {
     "Segunda-feira": "gcsegunda",
     "Terça-feira": "gcterca",
+    "Quarta-feira": "gcquarta",
     "Quinta-feira": "gcquinta",
     "Sexta-feira": "gcsexta",
     "Sábado": "gcsabado",
@@ -164,10 +167,10 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
   let outputDir;
 
   if (isIndividual) {
-    // ✅ Banners individuais serão salvos diretamente na pasta `public/`
+    //Banners individuais serão salvos diretamente na pasta `public/`
     outputDir = path.join(__dirname, "../../public");
   } else {
-    // ✅ Banners normais serão organizados por supervisor
+    //Banners normais serão organizados por supervisor
     const supervisorName = gc.supervisor.replace(/\s+/g, "-");
     const supervisorDir = path.join(__dirname, `../../public/${supervisorName}`);
 

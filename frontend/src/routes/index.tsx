@@ -9,7 +9,7 @@ export default function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/banner-form" element={<BannerForm />} />
-        <Route path="/upload-csv" element={<UploadCSV />} />
+        <Route path="/upload-tsv" element={<UploadCSV />} />
         
       </Routes>
     </Router>

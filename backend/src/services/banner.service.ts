@@ -169,7 +169,7 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
   } else {
     // ✅ Banners normais serão organizados por supervisor
     const supervisorName = gc.supervisor.replace(/\s+/g, "-");
-    const supervisorDir = path.join(__dirname, `../../public/Banners-${supervisorName}`);
+    const supervisorDir = path.join(__dirname, `../../public/${supervisorName}`);
 
     // Cria subpastas Feed e Story
     const feedDir = path.join(supervisorDir, "Feed");

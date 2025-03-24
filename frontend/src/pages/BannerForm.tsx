@@ -80,7 +80,7 @@ export default function BannerForm() {
     try {
       const fileName = fileUrl.split("/").pop(); // Obtém o nome do arquivo corretamente
       // const backendUrl = `http://localhost:4000/public/${fileName}`;
-      const backendUrl = `https://api-bannersgc.onrender.com/${fileName}`;
+      const backendUrl = `https://api-bannersgc.onrender.com/public/${fileName}`;
 
       console.log(`📥 Baixando: ${backendUrl}`);
 

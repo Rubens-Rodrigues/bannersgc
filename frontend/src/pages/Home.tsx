@@ -11,11 +11,11 @@ export default function Home() {
       <br></br>
       <br></br>
       <br></br>
-      <h1>Gerador de Banners</h1>
+      <h1>Gerador de Banners de GCs</h1>
       <div className="cards">
         <div className="card" onClick={() => navigate("/banner-form")}>
           <h2>📌 Criar Banner Único</h2>
-          <p>Preencha os dados manualmente e gere um banner.</p>
+          <p>Preencha os dados manualmente e gere um banner por local.</p>
         </div>
         <div className="card" onClick={() => navigate("/upload-tsv")}>
           <h2>📁 Criar Vários Banners</h2>

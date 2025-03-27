@@ -7,7 +7,8 @@ import { io } from "socket.io-client";
 import BannerPreview from "../components/BannerLayout/BannerPreview";
 
 // const BASE_URL = "http://localhost:4000/public/"; 
-const BASE_URL = "https://api-bannersgc.onrender.com/public/";
+// const BASE_URL = "https://api-bannersgc.onrender.com/public/";
+const BASE_URL = "https://api-gc.angelim.org/public/";
 
 export default function UploadCSV() {
   const [file, setFile] = useState<File | null>(null);
@@ -19,7 +20,8 @@ export default function UploadCSV() {
 
   useEffect(() => {
     // const socket = io("http://localhost:4000");
-    const socket = io("https://api-bannersgc.onrender.com");
+    // const socket = io("https://api-bannersgc.onrender.com");
+    const socket = io("https://api-gc.angelim.org");
 
     socket.on("banner_status", (data) => {
       setMessageLog((prev) => [...prev, data.log]);

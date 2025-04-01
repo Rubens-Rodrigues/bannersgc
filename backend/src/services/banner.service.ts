@@ -225,7 +225,7 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     ctx.font = `bold ${positions.endereco.size}px Arial`;
     ctx.fillStyle = positions.endereco.color;
     const textoLocal = "Local: " + gc.endereco;
-    const enderecoHeight = wrapText(ctx, textoLocal, positions.endereco.x, positions.endereco.y, 800, 37);
+    const enderecoHeight = wrapText(ctx, textoLocal, positions.endereco.x, positions.endereco.y, 800, 36);
 
     ctx.font = `bold ${positions.lideres.size}px Arial`;
     ctx.fillStyle = positions.lideres.color;

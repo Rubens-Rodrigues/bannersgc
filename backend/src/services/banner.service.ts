@@ -98,8 +98,8 @@ const textPositions = {
     dia: { x: 480, y: 856, size: 40, color: "#000", align: "left" },
     hora: { x: 655, y: 856, size: 40, color: "#000", align: "left" },
     bairro: { x: 540, y: 920, size: 25, color: "#000", align: "center" },
-    endereco: { x: 540, y: 1000, size: 25, color: "#000", align: "center" },
-    lideres: { x: 540, y: 1025, size: 25, color: "#000", align: "center" },
+    endereco: { x: 540, y: 960, size: 25, color: "#000", align: "center" },
+    lideres: { x: 540, y: 990, size: 25, color: "#000", align: "center" },
   },
   story: {
     title: { x: 540, y: 1095, size: 60, color: "#fff", align: "center" },

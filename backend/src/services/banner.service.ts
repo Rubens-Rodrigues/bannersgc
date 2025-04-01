@@ -20,7 +20,7 @@ export const processCSV = async (filePath: string, io: Server): Promise<string[]
           dia: (data["Dia"] || "").trim(),
           horario: (data["Horário"] || "").trim(),
           bairro: (data["Bairro"] || "").trim(),
-          endereco: (data["Endereço"] || "").trim().replace(/,/g, ""),
+          endereco: (data["Endereço"] || "").trim(),
           lideres: (data["Líderes"] || "").trim(),
           telefone: (data["Telefone"] || "").trim(),
           supervisor: (data["Supervisor"] || "Sem Supervisor").trim(),
@@ -225,7 +225,7 @@ export const generateBanner = async (gc: any, format: "feed" | "story", template
     ctx.font = `bold ${positions.endereco.size}px Arial`;
     ctx.fillStyle = positions.endereco.color;
     const textoLocal = "Local: " + gc.endereco;
-    const enderecoHeight = wrapText(ctx, textoLocal, positions.endereco.x, positions.endereco.y, 550, 30);
+    const enderecoHeight = wrapText(ctx, textoLocal, positions.endereco.x, positions.endereco.y, 800, 37);
 
     ctx.font = `bold ${positions.lideres.size}px Arial`;
     ctx.fillStyle = positions.lideres.color;

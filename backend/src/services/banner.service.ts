@@ -97,7 +97,7 @@ const textPositions = {
     title: { x: 540, y: 720, size: 60, color: "#fff", align: "center" },
     dia: { x: 480, y: 856, size: 40, color: "#000", align: "left" },
     hora: { x: 655, y: 856, size: 40, color: "#000", align: "left" },
-    bairro: { x: 540, y: 940, size: 25, color: "#000", align: "center" },
+    bairro: { x: 540, y: 920, size: 25, color: "#000", align: "center" },
     endereco: { x: 540, y: 980, size: 25, color: "#000", align: "center" },
     lideres: { x: 540, y: 1010, size: 25, color: "#000", align: "center" },
   },
